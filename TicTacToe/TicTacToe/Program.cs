@@ -68,18 +68,33 @@ namespace TicTacToe
             Console.ReadKey();
         }
 
-        private static void ShowBoard()
-        {
-            Console.WriteLine("     |     |     ");
-            Console.WriteLine("  {0}  |  {1}  |  {2}  ", board[0], board[1], board[2]);
-            Console.WriteLine("_____|_____|_____");
-            Console.WriteLine("     |     |     ");
-            Console.WriteLine("  {0}  |  {1}  |  {2}  ", board[3], board[4], board[5]);
-            Console.WriteLine("_____|_____|_____");
-            Console.WriteLine("     |     |     ");
-            Console.WriteLine("  {0}  |  {1}  |  {2}  ", board[6], board[7], board[8]);
-            Console.WriteLine("     |     |     ");
-        }
+private static void ShowBoard()
+{
+    Console.WriteLine("     |     |     ");
+    GetColorToCell(0); Console.Write("|"); GetColorToCell(1); Console.Write("|"); GetColorToCell(2);
+    Console.WriteLine("\n_____|_____|_____");
+    Console.WriteLine("     |     |     ");
+    GetColorToCell(3); Console.Write("|"); GetColorToCell(4); Console.Write("|"); GetColorToCell(5);
+    Console.WriteLine("\n_____|_____|_____");
+    Console.WriteLine("     |     |     ");
+    GetColorToCell(6); Console.Write("|"); GetColorToCell(7); Console.Write("|"); GetColorToCell(8);
+    Console.WriteLine("\n     |     |     ");
+}
+
+private static void GetColorToCell(int index)
+{
+    char cell = board[index];
+    if (cell == 'X')
+    {
+        Console.ForegroundColor = ConsoleColor.Blue;
+    }
+    else if (cell == 'O')
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+    }
+    Console.Write($"  {cell}  ");
+    Console.ResetColor();
+}
 
         private static int CheckWin()
         {
