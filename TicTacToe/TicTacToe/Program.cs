@@ -7,19 +7,27 @@ namespace TicTacToe
         static char[] board = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
         static int currentPlayer = 1;
         static int choice;
-        static int gameStatus = 0;
+        static GameStatus gameStatus = GameStatus.InProgress;
+        const char firstPlayerSymbol = 'X';
+        const char secondPlayerSymbol = 'O';
 
+        enum GameStatus
+        {
+            InProgress,
+            PlayerWins,
+            Draw    
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("Добро пожаловать в игру Крестики-Нолики!");
-            Console.WriteLine("Игрок 1: X, Игрок 2: O\n");
+            Console.WriteLine($"Игрок 1: {firstPlayerSymbol}, Игрок 2: {secondPlayerSymbol}\n");
             Console.WriteLine("Нажмите Enter, чтобы начать игру...");
             Console.ReadLine();
 
             do
             {
                 Console.Clear();
-                Console.WriteLine("Игрок {0}:", (currentPlayer % 2 == 0) ? "2 (O)" : "1 (X)");
+                Console.WriteLine("Игрок {0}:", (currentPlayer % 2 == 0) ? $"2 ({secondPlayerSymbol})" : $"1 ({firstPlayerSymbol})");
                 Console.WriteLine("\n");
                 ShowBoard();
 
@@ -31,8 +39,8 @@ namespace TicTacToe
                     validInput = int.TryParse(input, out choice) &&
                                 choice >= 1 &&
                                 choice <= 9 &&
-                                board[choice - 1] != 'X' &&
-                                board[choice - 1] != 'O';
+                                board[choice - 1] != firstPlayerSymbol &&
+                                board[choice - 1] != secondPlayerSymbol;
 
                     if (!validInput)
                     {
@@ -40,19 +48,19 @@ namespace TicTacToe
                     }
                 }
 
-                char mark = (currentPlayer % 2 == 0) ? 'O' : 'X';
+                char mark = (currentPlayer % 2 == 0) ? secondPlayerSymbol : firstPlayerSymbol;
                 board[choice - 1] = mark;
 
                 gameStatus = CheckWin();
 
-                if (gameStatus == 1)
+                if (gameStatus == GameStatus.PlayerWins)
                 {
                     Console.Clear();
                     ShowBoard();
-                    Console.WriteLine("\nИгрок {0} победил!", (currentPlayer % 2 == 0) ? "2 (O)" : "1 (X)");
+                    Console.WriteLine("\nИгрок {0} победил!", (currentPlayer % 2 == 0) ? $"2 ({secondPlayerSymbol})" : $"1 ({firstPlayerSymbol})");
                     break;
                 }
-                else if (gameStatus == -1)
+                else if (gameStatus == GameStatus.Draw)
                 {
                     Console.Clear();
                     ShowBoard();
@@ -84,11 +92,11 @@ private static void ShowBoard()
 private static void GetColorToCell(int index)
 {
     char cell = board[index];
-    if (cell == 'X')
+    if (cell == firstPlayerSymbol)
     {
         Console.ForegroundColor = ConsoleColor.Blue;
     }
-    else if (cell == 'O')
+    else if (cell == secondPlayerSymbol)
     {
         Console.ForegroundColor = ConsoleColor.Red;
     }
@@ -96,59 +104,59 @@ private static void GetColorToCell(int index)
     Console.ResetColor();
 }
 
-        private static int CheckWin()
+        private static GameStatus CheckWin()
         {
 
             if (board[0] == board[1] && board[1] == board[2])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[3] == board[4] && board[4] == board[5])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[6] == board[7] && board[7] == board[8])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[0] == board[3] && board[3] == board[6])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[1] == board[4] && board[4] == board[7])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[2] == board[5] && board[5] == board[8])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[0] == board[4] && board[4] == board[8])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[2] == board[4] && board[4] == board[6])
             {
-                return 1;
+                return GameStatus.PlayerWins;
             }
 
             else if (board[0] != '1' && board[1] != '2' && board[2] != '3' &&
                      board[3] != '4' && board[4] != '5' && board[5] != '6' &&
                      board[6] != '7' && board[7] != '8' && board[8] != '9')
             {
-                return -1;
+                return GameStatus.Draw;
             }
 
             else
             {
-                return 0;
+                return GameStatus.InProgress;
             }
         }
     }
