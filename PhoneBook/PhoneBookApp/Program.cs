@@ -29,7 +29,13 @@ namespace PhoneBookApp
                 switch (choice)
                 {
                     case "1":
-                        phonebook.AddAbonent();
+                        Console.Clear();
+                        Console.WriteLine("-----СОЗДАНИЕ АБОНЕНТА-----\n");
+                        Console.Write("Введите имя абонента: ");
+                        string abonentName = Console.ReadLine();
+                        Console.Write("Введите номер абонента: ");
+                        string abonentPhoneNumber = Console.ReadLine();
+                        phonebook.AddAbonent(abonentName, abonentPhoneNumber);
                         break;
 
                     case "2":
@@ -55,6 +61,8 @@ namespace PhoneBookApp
                         phonebook.GetAbonentByPhoneNumber(requiredAbonentPhoneNumber);
                         break;
                     case "5":
+                        Console.Clear();
+                        Console.WriteLine("-----СПИСОК ВСЕХ АБОНЕНТОВ-----\n");
                         phonebook.GetAllAbonents();
                         break;
                     case "6":

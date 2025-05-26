@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using AbonentClass;
 
@@ -8,8 +11,8 @@ namespace PhonebookClass
     {
         private static readonly Lazy<Phonebook> _instance = new Lazy<Phonebook>(() => new Phonebook());
         public static Phonebook Instance => _instance.Value;
-        private readonly string FilePath = "phonebook.json";
-        private List<Abonent> Abonents;
+        private const string FilePath = "phonebook.json";
+        public List<Abonent> Abonents;
         private Phonebook()
         {
             LoadPhoneBook();
@@ -18,14 +21,10 @@ namespace PhonebookClass
         /// <summary>
         /// Добавление абонента в телефонную книгу
         /// </summary>
-        public void AddAbonent()
+        /// <param name="abonentName">Принимамое имя абонента</param>
+        /// <param name="abonentPhoneNumber">Принимамемый номер телефона абонента</param>
+        public void AddAbonent(string abonentName, string abonentPhoneNumber)
         {
-            Console.Clear();
-            Console.WriteLine("-----СОЗДАНИЕ АБОНЕНТА-----");
-            Console.Write("Введите имя абонента: ");
-            string abonentName = Console.ReadLine();
-            Console.Write("Введите номер абонента: ");
-            string abonentPhoneNumber = Console.ReadLine();
             Abonent newAbonent = new Abonent(abonentName, abonentPhoneNumber);
             if (!Abonents.Any(a => a.Name.Equals(newAbonent.Name, StringComparison.OrdinalIgnoreCase)))
             {
@@ -82,33 +81,38 @@ namespace PhonebookClass
         /// Поиск абонента по имени
         /// </summary>
         /// <param name="abonentName">Передаваемое имя абонента</param>
-        public void GetAbonentByName(string abonentName)
+        /// <returns>
+        /// Найденный объект Abonent, если абонент существует;
+        /// null, если абонент не найден;
+        /// Измененная версия абонента, если пользователь выбрал редактирование
+        /// </returns>
+        public Abonent GetAbonentByName(string abonentName)
         {
             var abonent = Abonents.FirstOrDefault(a => a.Name.Equals(abonentName, StringComparison.OrdinalIgnoreCase));
             if (abonent != null)
             {
-                Console.WriteLine($"Имя: {abonent.Name}\n"
-                                 + $"Номер телефона: {abonent.PhoneNumber}\n");
-                Console.WriteLine("Хотите изменить информацию об абоненте?\n"
-                                 + "1. Да\n"
-                                 + "2. Нет\n");
-                Console.Write("Выберите действие: ");
-
-                string choice = Console.ReadLine();
-
-                switch (choice)
+                while (true)
                 {
-                    case "1":
-                        abonent = ChangeInformation(abonent);
-                        Console.WriteLine("\nНажмите Enter, чтобы вернуться в меню...");
-                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
-                        {
+                    Console.WriteLine($"Имя: {abonent.Name}\n"
+                                     + $"Номер телефона: {abonent.PhoneNumber}\n");
+                    Console.WriteLine("Хотите изменить информацию об абоненте?\n"
+                                     + "1. Да\n"
+                                     + "2. Нет\n");
+                    Console.Write("Выберите действие: ");
 
-                        }
-                        break;
+                    string choice = Console.ReadLine();
 
-                    case "2":
-                        return;
+                    switch (choice)
+                    {
+                        case "1":
+                            return ChangeInformation(abonent);
+
+                        case "2":
+                            return abonent;
+                        default:
+                            Console.WriteLine("Неверный ввод");
+                            break;
+                    }
                 }
             }
             else
@@ -119,26 +123,33 @@ namespace PhonebookClass
                 {
 
                 }
+                return null;
             }
-
         }
 
         /// <summary>
         /// Изменение информации об абоненте
         /// </summary>
         /// <param name="abonent">Передаваемый абонент,чьи данные нужжно изменить</param>
-        /// <returns></returns>
+        /// <returns>
+        /// Измененная версия абонента
+        /// </returns>
         public Abonent ChangeInformation(Abonent abonent)
         {
             Console.WriteLine($"Текущие Имя и Телефон абонента: {abonent.Name}, {abonent.PhoneNumber}");
             Console.Write("Введите новое имя абонента: ");
             string changingName = Console.ReadLine();
-            Console.WriteLine("Введите новый номер абонента: ");
+            Console.Write("Введите новый номер абонента: ");
             string changingPhoneNumber = Console.ReadLine();
             abonent.Name = changingName;
             abonent.PhoneNumber = changingPhoneNumber;
             Console.WriteLine($"Новые Имя и Телефон абонента: {abonent.Name}, {abonent.PhoneNumber}");
             SavePhoneBook();
+            Console.WriteLine("\nНажмите Enter, чтобы вернуться в меню...");
+            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+            {
+
+            }
             return abonent;
         }
 
@@ -146,60 +157,85 @@ namespace PhonebookClass
         /// Поиск абонента по номеру телефона
         /// </summary>
         /// <param name="abonentPhoneNumber">Передаваемый номер телефона абонента</param>
-        public void GetAbonentByPhoneNumber(string abonentPhoneNumber)
+        /// <returns>
+        /// Найденный объект Abonent, если абонент существует;
+        /// null, если абонент не найден;
+        /// Измененная версия абонента, если пользователь выбрал редактирование
+        /// </returns>
+        public Abonent GetAbonentByPhoneNumber(string abonentPhoneNumber)
         {
             var abonent = Abonents.FirstOrDefault(a => a.PhoneNumber == abonentPhoneNumber);
             if (abonent != null)
             {
-                Console.WriteLine($"Имя: {abonent.Name}\n"
-                                + $"Номер телефона: {abonent.PhoneNumber}\n");
-
-                Console.WriteLine("Хотите изменить информацию об абоненте?"
-                     + "1. Да"
-                     + "2. Нет");
-                Console.Write("Выберите действие: ");
-
-                string choice = Console.ReadLine();
-
-                switch (choice)
+                while (true)
                 {
-                    case "1":
-                        abonent = ChangeInformation(abonent);
-                        Console.WriteLine("\nНажмите Enter, чтобы вернуться в меню...");
-                        while (Console.ReadKey(true).Key != ConsoleKey.Enter)
-                        {
+                    Console.WriteLine($"Имя: {abonent.Name}\n"
+                                     + $"Номер телефона: {abonent.PhoneNumber}\n");
+                    Console.WriteLine("Хотите изменить информацию об абоненте?\n"
+                                     + "1. Да\n"
+                                     + "2. Нет\n");
+                    Console.Write("Выберите действие: ");
 
-                        }
-                        break;
+                    string choice = Console.ReadLine();
 
-                    case "2":
-                        return;
+                    switch (choice)
+                    {
+                        case "1":
+                            return ChangeInformation(abonent);
+
+                        case "2":
+                            return abonent;
+                        default:
+                            Console.WriteLine("Неверный ввод");
+                            break;
+                    }
                 }
             }
             else
             {
                 Console.WriteLine($"Абонент с номером {abonentPhoneNumber} не найден");
+                Console.WriteLine("\nНажмите Enter, чтобы вернуться в меню...");
+                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                {
+
+                }
+                return null;
             }
         }
 
         /// <summary>
         /// Вывод всех абонентов
         /// </summary>
-        public void GetAllAbonents()
+        /// <returns>
+        /// Отсортированный по именам список абонентов
+        /// null, если количество абонентов в телефонной книге равно 0
+        /// </returns>
+        public List<Abonent> GetAllAbonents()
         {
-            Console.Clear();
-            Console.WriteLine("-----СПИСОК ВСЕХ АБОНЕНТОВ-----\n");
-            var sortedAbonents = Abonents.OrderBy(a => a.Name);
-
-            foreach (var abonent in sortedAbonents)
+            var sortedAbonents = Abonents.OrderBy(a => a.Name).ToList();
+            if (sortedAbonents.Count != 0)
             {
-                Console.WriteLine($"Имя: {abonent.Name}\n"
-                                 + $"Номер телефона: {abonent.PhoneNumber}\n");
+                foreach (var abonent in sortedAbonents)
+                {
+                    Console.WriteLine($"Имя: {abonent.Name}\n"
+                                     + $"Номер телефона: {abonent.PhoneNumber}\n");
+                }
+                Console.WriteLine("\nНажмите Enter, чтобы вернуться в меню...");
+                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                {
+
+                }
+                return sortedAbonents;
             }
-            Console.WriteLine("\nНажмите Enter, чтобы вернуться в меню...");
-            while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+            else
             {
+                Console.WriteLine("В телефонной книге нет абонентов");
+                Console.WriteLine("\nНажмите Enter, чтобы вернуться в меню...");
+                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                {
 
+                }
+                return null;
             }
         }
 
