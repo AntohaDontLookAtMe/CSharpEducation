@@ -21,8 +21,8 @@ namespace PhonebookClass
         /// <summary>
         /// Добавление абонента в телефонную книгу
         /// </summary>
-        /// <param name="abonentName">Принимамое имя абонента</param>
-        /// <param name="abonentPhoneNumber">Принимамемый номер телефона абонента</param>
+        /// <param name="abonentName">Принимаемое имя абонента</param>
+        /// <param name="abonentPhoneNumber">Принимаемый номер телефона абонента</param>
         public void AddAbonent(string abonentName, string abonentPhoneNumber)
         {
             Abonent newAbonent = new Abonent(abonentName, abonentPhoneNumber);
