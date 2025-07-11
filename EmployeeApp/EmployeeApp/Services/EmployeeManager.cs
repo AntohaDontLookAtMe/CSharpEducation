@@ -12,46 +12,47 @@ using System.Xml.Linq;
 
 namespace EmployeeApp.Services
 {
+    /// <summary>
+    /// Класс для работы с данными сотрудников.
+    /// </summary>
+    /// <typeparam name="T">Тип сотрудников</typeparam>
     public class EmployeeManager<T> : IEmployeeManager<T> where T : Employee
     {
+        #region
+
         private List<T> employees = new List<T>();
         private readonly string filePath = "employees.json";
         private int nextId = 0;
 
-        /// <summary>
-        /// Добавление работника в список
-        /// </summary>
-        /// <param name="employee">Данные работника</param>
-        /// <exception cref="EmployeeAlreadyExistsException">Ошибка если имя работника уже занято</exception>
+        #endregion
+
+        #region Методы
+
+        #region Методы, реализующие интерфейс IEmployeeManager
+
         public void AddEmployee(T employee)
         {
             if (employees.Any(e => e.Name.Equals(employee.Name, StringComparison.OrdinalIgnoreCase)))
+            {
                 throw new EmployeeAlreadyExistsException(employee.Name);
+            }
             employee.Id = nextId++;
             employees.Add(employee);
             SaveJSON();
         }
-        /// <summary>
-        /// Выадёт информацию о работнике
-        /// </summary>
-        /// <param name="name">Имя работника</param>
-        /// <returns></returns>
-        /// <exception cref="EmployeeNotFoundException">Ошибка если имя работника не найдено</exception>
+
         public T GetEmployee(string name)
         {
             var employee = employees.FirstOrDefault(e => e.Name == name);
             if (employee == null)
+            {
                 throw new EmployeeNotFoundException(name);
+            }
             Console.WriteLine($"id сотрудника: {employee.Id}\n"+
                               $"Имя сотрудника: {employee.Name}");
             return employee;
         }
 
-        /// <summary>
-        /// Обновление данных о работнике
-        /// </summary>
-        /// <param name="employee">Данные работника</param>
-        /// <exception cref="EmployeeAlreadyExistsException">Ошибка если имя работника уже занято</exception>
         public void UpdateEmployee(T employee)
         {
             Console.WriteLine("Введите новое имя сотрудника: ");
@@ -73,11 +74,6 @@ namespace EmployeeApp.Services
             SaveJSON();
         }
 
-        /// <summary>
-        /// Удаление работника
-        /// </summary>
-        /// <param name="name">Имя работника</param>
-        /// <exception cref="EmployeeNotFoundException">Ошибка если имя работника не найдено</exception>
         public void DeleteEmployee(string name)
         {
             var employee = employees.FirstOrDefault(e => e.Name == name);
@@ -88,31 +84,43 @@ namespace EmployeeApp.Services
             SaveJSON();
         }
 
+        #endregion
+
+        /// <summary>
+        /// Сохранение данных в файле JSON.
+        /// </summary>
         public void SaveJSON()
         {
-            var settings = new JsonSerializerSettings
+            var saveSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
                 TypeNameHandling = TypeNameHandling.Auto
             };
 
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(employees, settings));
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(employees, saveSettings));
         }
 
+        /// <summary>
+        /// Загрузка данных из файла JSON.
+        /// </summary>
         public void LoadJSON()
         {
-            if (!File.Exists(filePath)) return;
-
-            var settings = new JsonSerializerSettings
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+            var loadSettings = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto
             };
 
-            employees = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filePath), settings)
-                        ?? new List<T>();
+            employees = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filePath), loadSettings)
+              ?? new List<T>();
 
             if (employees.Any())
                 nextId = employees.Max(e => e.Id) + 1;
         }
+
+        #endregion
     }
 }

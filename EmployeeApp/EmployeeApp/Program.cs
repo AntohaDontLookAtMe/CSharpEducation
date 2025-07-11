@@ -6,10 +6,19 @@ using System.Threading;
 
 namespace EmployeeApp
 {
+    /// <summary>
+    /// Главная точка входа в приложение
+    /// </summary>
     class Program
     {
+        /// <summary>
+        /// Менеджер сотрудников,осуществляющий работу с данными сотрудников
+        /// </summary>
         static EmployeeManager<Employee> manager = new EmployeeManager<Employee>();
 
+        /// <summary>
+        /// Главный метод запуска программы
+        /// </summary>
         static void Main()
         {
             manager.LoadJSON();
